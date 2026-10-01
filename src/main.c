@@ -57,15 +57,18 @@ void bellman_ford()
         affected[i] = 0;
     }
 
-    dist[source] = 0;
+  /* Initialize source distance */
+            dist[source] = 0;
 
-    for (pass = 1; pass <= vertex_count - 1; pass++)
-    {
-        updated = 0;
-        passes_used++;
+/* Relax all edges V - 1 times */
+            for (pass = 1; pass <= vertex_count - 1; pass++)
+            {
+            updated = 0;
+            passes_used++;
 
-        for (j = 0; j < edge_count; j++)
-        {
+            /* One extra pass to detect a reachable negative cycle */
+            for (j = 0; j < edge_count; j++)
+            {
             int u = edges[j].from;
             int v = edges[j].to;
             int w = edges[j].cost;
@@ -100,27 +103,42 @@ void bellman_ford()
         }
     }
 
-    if (has_negative_cycle == 1)
+    /* Mark vertices affected by the negative cycle */
+if (has_negative_cycle == 1)
+{
+    for (i = 0; i < vertex_count; i++)
     {
-        for (i = 0; i < vertex_count; i++)
+        for (j = 0; j < edge_count; j++)
         {
-            for (j = 0; j < edge_count; j++)
-            {
-                if (affected[edges[j].from] == 1)
-                    affected[edges[j].to] = 1;
-            }
+            if (affected[edges[j].from] == 1)
+                affected[edges[j].to] = 1;
         }
     }
+}
 
     algorithm_run = 1;
 }
 
 void print_path(int v)
 {
-    if (parent[v] != -1)
-        print_path(parent[v]);
+    int path[MAXV];
+    int count = 0;
+    int current = v;
 
-    printf("%d ", v);
+    while (current != -1 && count < MAXV)
+    {
+        path[count++] = current;
+        current = parent[current];
+    }
+
+    if (current != -1)
+    {
+        printf("Path reconstruction error ");
+        return;
+    }
+
+    for (int i = count - 1; i >= 0; i--)
+        printf("%d ", path[i]);
 }
 
 void show_route(int v)
